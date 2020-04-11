@@ -46,7 +46,7 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
         #5. calculate delays
         delays = 3 * ones(Int, size(distances));
 
-        for lasso in .05:.05:2.5
+        for lasso in .05:.05:5.0
             min_stock = 0.9
             alpha = 0.10
             surge_correction = 0.5
