@@ -68,6 +68,7 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
             supply_long[:Fmax] = 1-min_stock
             supply_long[:Buffer] = alpha
             supply_long[:SurgeCorrection] = surge_correction
+            supply_long[:Lasso] = lasso
             supply_table = vcat(supply_table, supply_long)
             
             ## Transfer table
@@ -76,6 +77,7 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
             transfers_long[:Fmax] = 1-min_stock
             transfers_long[:Buffer] = alpha
             transfers_long[:SurgeCorrection] = surge_correction
+            transfers_long[:Lasso] = lasso
             transfers_table = vcat(transfers_table, transfers_long)
 
             CSV.write("$(@__DIR__)/../results/supply_temp_$(model_choice).csv", supply_table)
