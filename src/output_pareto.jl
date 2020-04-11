@@ -46,17 +46,18 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
         #5. calculate delays
         delays = 3 * ones(Int, size(distances));
 
-        for min_stock in [0.8, 0.85, 0.9, 0.95],
-            alpha in [0.0, 0.05, 0.10, 0.20],
-            surge_correction in [0.5, 0.75, 0.9, 1.0]
+        for lasso in .05:.05:2.5
+            min_stock = 0.9
+            alpha = 0.10
+            surge_correction = 0.5
 
-            println("Parameters: model = $(model_choice), min_stock = $(min_stock), alpha = $alpha, surge_correction = $(surge_correction)")
+            println("Parameters: model = $(model_choice), lasso = $lasso")
 
             supply, transfers, surge_transfers = allocate_ventilators(demands, base_supply .* 0.5,
                                                      surge_supply .* surge_correction, distances,
                                                      delays, only_send_excess=true,
                                                      minimum_stock_fraction = min_stock,
-                                                     alpha=alpha, lasso=0.1,
+                                                     alpha=alpha, lasso=lasso,
                                                      max_ship_per_day = 3000.0,
                                                      OutputFlag=0, TimeLimit=600, MIPGap=0.01,
                                                      vent_days=10);
@@ -91,8 +92,8 @@ end
 
 version = ARGS[1]
 supply, transfers = solve_transfers()
-CSV.write("$(@__DIR__)/../results/supply_$version.csv", supply)
-CSV.write("$(@__DIR__)/../results/transfers_$version.csv", transfers)
+CSV.write("$(@__DIR__)/../results/supply-pareto_$version.csv", supply)
+CSV.write("$(@__DIR__)/../results/transfers-pareto_$version.csv", transfers)
 
 
 
