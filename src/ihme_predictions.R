@@ -1,10 +1,10 @@
 library(tidyverse)
 
-start_date = "2020-04-09"
+start_date = "2020-04-16"
 end_date = "2020-06-01"
 
 ### IHME Predictions
-df_ihme <- read.csv("../raw_data/ihme-2020_04_07.csv", stringsAsFactors = FALSE)
+df_ihme <- read.csv("../raw_data/ihme-2020_04_12.csv", stringsAsFactors = FALSE)
 
 # state_list <- data.frame(State = state.name)
 # write.csv(state_list, "../processed/state_list.csv", row.names = FALSE)

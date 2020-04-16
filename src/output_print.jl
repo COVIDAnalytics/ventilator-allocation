@@ -116,14 +116,15 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
 	    #5. calculate delays
 	    delays = 3 * ones(Int, size(distances));
 
-		for min_stock in [0.8, 0.85, 0.9, 0.95],
+		for min_stock in [0.8, 0.85, 0.9, 0.95, 1.0],
 			alpha in [0.0, 0.05, 0.10, 0.20],
-			surge_correction in [0.5, 0.75, 0.9, 1.0]
+			surge_correction in [0.0, 0.5, 0.75, 0.9, 1.0]
 
             println("Parameters: model = $(model_choice), min_stock = $(min_stock), alpha = $alpha, surge_correction = $(surge_correction)")
 
-		    supply, transfers = allocate_ventilators(demands, base_supply .* 0.5,
-		                                             surge_supply .* surge_correction, distances,
+		    supply, transfers = allocate_ventilators(demands, ceil.(base_supply .* 0.5),
+		                                             ceil.(surge_supply .* surge_correction),
+		                                             distances,
 		                                             delays, only_send_excess=true,
 		                                             minimum_stock_fraction = min_stock,
 		                                             alpha=alpha, lasso=0.1,
@@ -159,8 +160,8 @@ end
 
 # --- Main module ---
 supply, transfers = solve_transfers()
-CSV.write("$(@__DIR__)/../results/supply_integer.csv", supply)
-CSV.write("$(@__DIR__)/../results/transfers_integer.csv", transfers)
+CSV.write("$(@__DIR__)/../results/supply_integer_200416.csv", supply)
+CSV.write("$(@__DIR__)/../results/transfers_integer_200416.csv", transfers)
 
 
 
