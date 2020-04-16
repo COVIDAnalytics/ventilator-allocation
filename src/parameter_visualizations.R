@@ -86,19 +86,22 @@ results <- inner_join(supply_summary, transfers_summary,
 names(results)
 
 
-results %>% filter(Buffer == 0.1) %>%
-  ggplot(aes(x = objShortage, y = objTransfers, color = SurgeCorrection, shape = as.factor(Fmax))) +
-  facet_grid(.~DataSource, labeller = label_both, scales = "free_x") +
-  geom_point()
+# results %>% filter(Buffer == 0.1) %>%
+#   ggplot(aes(x = objShortage, y = objTransfers, color = SurgeCorrection, shape = as.factor(Fmax))) +
+#   facet_grid(.~DataSource, labeller = label_both, scales = "free_x") +
+#   geom_point()
 
 results %>%
+  as.data.frame() %>%
+  mutate(DataSource = if_else(DataSource=="ihme", "IHME", "DELPHI")) %>%
   filter(Buffer == 0.1) %>%
-  ggplot(aes(x = Fmax, y = TotalShortage,
+  ggplot(aes(x = Fmax, y = TransferUnits_StateLevel/TransferUnits,
              group = SurgeCorrection, color = SurgeCorrection)) + 
-  facet_grid(.~DataSource, labeller = label_both) +
+  facet_grid(.~DataSource, labeller = label_both, scales = "free_y") +
   geom_line() +
   theme_bw() + 
   theme(legend.position = "bottom") +
-  labs(title = "Parameter Sensitivity: Total Shortage",
+  labs(title = "Parameter Sensitivity: State vs. Federal Transfers",
        x = "Pooling Fraction",
+       y = "Proportion of Transfers Initiated Between States",
        color="Surge Correction") 

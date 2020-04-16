@@ -50,9 +50,16 @@ transfers_summary <- df_transfers %>%
 
 results <- left_join(supply_summary, transfers_summary, 
                       by = c("DataSource", "SurgeCorrection", "Fmax", "Buffer", "Lasso")) %>%
-  mutate_if(is.numeric , replace_na, replace = 0)
+  mutate_if(is.numeric , replace_na, replace = 0) %>%
+  mutate(Chosen_Lasso = if_else(Lasso == 0.1, "Yes","No"))
 
 results %>% 
-  ggplot(aes(x = TotalShortage, y = TransferUnits)) + 
+  ggplot(aes(x = TotalShortage, y = TransferUnits, color = Chosen_Lasso)) + 
   facet_grid(.~DataSource, labeller = label_both, scales = "free_x") +
-  geom_point()
+  geom_point() +
+  theme_bw() + 
+  theme(legend.position = "bottom") +
+  labs(title = "Pareto Efficiency Curve Across Lasso Parameters",
+       x = "Total Shortage",
+       y="Number of Transferred Units",
+       color = "Chosen Lambda") 
