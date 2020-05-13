@@ -5,8 +5,8 @@ version = "200416"
 model_choice = "ode"
 
 ## Read in data
-df_supply <- read.csv(paste0("../results/supply_integer_",version,".csv"))
-df_transfers <- read.csv(paste0("../results/transfers_integer_",version,".csv"))
+df_supply <- read.csv(paste0("../results/supply_",version,".csv"))
+df_transfers <- read.csv(paste0("../results/transfers_",version,".csv"))
 df_baseline <- read.csv(paste0("../results/supply_baseline_",version,".csv"))
 
 df_supply <- df_supply %>% mutate(Date = as.Date(Date), Supply_Excess = pmax(0,Supply_Excess*-1)) %>%
@@ -54,7 +54,6 @@ write.csv(transfers_parsed, paste0("../results/old/transfers_table-",version,"-"
 # Process Baselines -------------------------------------------------------
 
 baseline_parsed <- df_baseline %>%
-  filter(Date < as.Date(""))
   filter(Date < as.Date("2020-06-01")) %>%
   rename(Param1 = Fmax, Param2 = Buffer, Param3 = SurgeCorrection) %>%
   filter(DataSource == model_choice) %>%

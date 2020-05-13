@@ -1,6 +1,6 @@
 library(tidyverse)
 
-start_date = "2020-04-16"
+start_date = "2020-04-15"
 end_date = "2020-06-01"
 
 ### IHME Predictions

@@ -105,6 +105,7 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
 	    #3. load surge_supply
 	    surge_supply = 450.0 * ones(size(demands, 2))
 	    surge_supply[1:3] .= 0.0
+	    surge_supply[34:end] .= 0.0
 	    # surge_supply = load_surge_supply(demands, surge_days, surge_amount)
 
 	    #4. calculate distance
@@ -141,7 +142,7 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
 		    supply_table = vcat(supply_table, supply_long)
 		    
 		    ## Transfer table
-		    transfers_long = transfers_to_long(transfers, states, demand_days)
+		    transfers_long = transfers_to_long(transfers, states, demand_days, surge = )
 		    transfers_long[:DataSource] = model_choice
 		    transfers_long[:Fmax] = 1-min_stock
 		    transfers_long[:Buffer] = alpha
