@@ -1,12 +1,12 @@
 library(tidyverse)
 library(reshape2)
 
-version = "0409"
+version = "200416"
 model_choice = "ode"
 
 ## Read in data
-df_supply <- read.csv(paste0("../results/supply_",version,".csv"))
-df_transfers <- read.csv(paste0("../results/transfers_",version,".csv"))
+df_supply <- read.csv(paste0("../results/supply_integer_",version,".csv"))
+df_transfers <- read.csv(paste0("../results/transfers_integer_",version,".csv"))
 df_baseline <- read.csv(paste0("../results/supply_baseline_",version,".csv"))
 
 df_supply <- df_supply %>% mutate(Date = as.Date(Date), Supply_Excess = pmax(0,Supply_Excess*-1)) %>%
@@ -25,7 +25,7 @@ df_supply %>% filter(Shortage > 0) %>% pull(Date) %>% max()
 # Process Optimization Predictions ----------------------------------------
 
 supply_parsed <- df_supply %>%
-  filter(Date < as.Date("2020-05-01")) %>%
+  filter(Date < as.Date("2020-05-08")) %>%
   rename(Param1 = Fmax, Param2 = Buffer, Param3 = SurgeCorrection) %>%
   filter(DataSource == model_choice) %>%
   select(-DataSource)
@@ -37,7 +37,7 @@ write.csv(supply_parsed, paste0("../results/old/state_supplies_table-",version,"
 
 transfers_parsed <- df_transfers %>%
   mutate(Date = if_else(State_From == "Federal", Date - 3, Date)) %>%
-  filter(Date < as.Date("2020-05-01")) %>%
+  filter(Date < as.Date("2020-05-08")) %>%
   rename(Param1 = Fmax, Param2 = Buffer, Param3 = SurgeCorrection) %>%
   filter(DataSource == model_choice) %>%
   select(-DataSource) %>%
@@ -54,6 +54,7 @@ write.csv(transfers_parsed, paste0("../results/old/transfers_table-",version,"-"
 # Process Baselines -------------------------------------------------------
 
 baseline_parsed <- df_baseline %>%
+  filter(Date < as.Date(""))
   filter(Date < as.Date("2020-06-01")) %>%
   rename(Param1 = Fmax, Param2 = Buffer, Param3 = SurgeCorrection) %>%
   filter(DataSource == model_choice) %>%
