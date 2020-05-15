@@ -1,1 +1,4 @@
 *.DS_Store
+results/supply_paper1.csv
+results/*
+results/transfers_paper1.csv

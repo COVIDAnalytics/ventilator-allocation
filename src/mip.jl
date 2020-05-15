@@ -107,8 +107,7 @@ function allocate_ventilators(demands::Matrix, base_supply::Vector, surge_supply
     # objective: minimize shortfall subject to LASSO penalty on flows
     @objective(model, Min, sum(shortfall[s, d] for s=1:S, d=1:D) +
                            rho * sum(buffer[s, d] for s=1:S, d=1:D) +
-                           lasso * (sum((distances[s1, s2] + 10) * flow[s1, s2, d] for s1 = 1:S, s2 = 1:S, d = 1:D)
-                                        + 10 * sum(surge[s, d] for s=1:S, d=1:D)))
+                           lasso * (sum((distances[s1, s2] + 10) * flow[s1, s2, d] for s1 = 1:S, s2 = 1:S, d = 1:D)))
 
     solve(model)
     supply_levels = [getvalue(supply[s, d]) for s=1:S, d=1:D]

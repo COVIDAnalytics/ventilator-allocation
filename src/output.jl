@@ -20,11 +20,11 @@ include("$(@__DIR__)" * "/output_helpers.jl")
 """
 
 # --- Wrapper function solving for transfers-----
-function solve_transfers(surge_days=[1], surge_amount=[0])
+function solve_transfers()
     supply_table = DataFrame()
     transfers_table = DataFrame()
 
-    for model_choice in ["ihme", "ode"]
+    for model_choice in ["ode"] #["ihme", "ode"]
         states = load_states(model_choice)
 
         #1. load demand
@@ -47,19 +47,22 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
         delays = 3 * ones(Int, size(distances));
 
         for min_stock in [0.8, 0.85, 0.9, 0.95, 1.0],
-            alpha in [0.0, 0.05, 0.10, 0.20],
-            surge_correction in [0.0, 0.5, 0.75, 0.9, 1.0]
+            alpha in [0.0],#[0.0, 0.05, 0.10, 0.20],
+            surge_correction in [0.0, 0.5, 1.0],#[0.0, 0.5, 0.75, 0.9, 1.0],
+            lasso in 10.0 .^ range(log10(0.05), log10(1.0), length=40)
 
-            println("Parameters: model = $(model_choice), min_stock = $(min_stock), alpha = $alpha, surge_correction = $(surge_correction)")
+            println("Parameters: model = $(model_choice), min_stock = $(min_stock), alpha = $alpha, surge_correction = $(surge_correction), lasso = $lasso")
 
-            supply, transfers, surge_transfers = allocate_ventilators(demands, ceil.(base_supply .* 0.5),
-                                                     ceil.(surge_supply .* surge_correction), distances,
-                                                     delays, only_send_excess=true,
-                                                     minimum_stock_fraction = min_stock,
-                                                     alpha=alpha, lasso=0.1,
-                                                     max_ship_per_day = 3000.0,
-                                                     OutputFlag=0, TimeLimit=600, MIPGap=0.01,
-                                                     vent_days=10);
+            supply, transfers, surge_transfers = allocate_ventilators(demands,
+                                            ceil.(base_supply .* 0.5),
+                                            ceil.(surge_supply .* surge_correction),
+                                            distances,
+	                                        delays, only_send_excess=true,
+	                                        minimum_stock_fraction = min_stock,
+	                                        alpha=alpha, lasso=lasso,
+	                                        max_ship_per_day = 3000.0,
+	                                        OutputFlag=0, TimeLimit=600, MIPGap=0.01,
+	                                        vent_days=10);
             
             ## Supply table
             supply_long = supplies_to_long(supply, demands, states, demand_days, base_supply)
@@ -67,6 +70,7 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
             supply_long[:Fmax] = 1-min_stock
             supply_long[:Buffer] = alpha
             supply_long[:SurgeCorrection] = surge_correction
+            supply_long[:Lasso] = lasso
             supply_table = vcat(supply_table, supply_long)
             
             ## Transfer table
@@ -75,6 +79,7 @@ function solve_transfers(surge_days=[1], surge_amount=[0])
             transfers_long[:Fmax] = 1-min_stock
             transfers_long[:Buffer] = alpha
             transfers_long[:SurgeCorrection] = surge_correction
+            transfers_long[:Lasso] = lasso
             transfers_table = vcat(transfers_table, transfers_long)
 
             CSV.write("$(@__DIR__)/../results/supply_temp_$(model_choice).csv", supply_table)
